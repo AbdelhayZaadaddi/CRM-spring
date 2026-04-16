@@ -14,15 +14,20 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Set up JDK 17
+            - name: Set up JDK 21
               uses: actions/setup-java@v4
               with:
-                  java-version: "17"
+                  java-version: "21"
                   distribution: "temurin"
                   cache: "maven"
 
             - name: Build and Test with Maven
               run: mvn -B test
+              env:
+                  DB_URL: jdbc:h2:mem:testdb
+                  DB_USERNAME: sa
+                  DB_PASSWORD: ""
+                  JWT_SECRET: dGVzdC1zZWNyZXQta2V5LWZvci11bml0LXRlc3RzLW9ubHk=
 
             - name: Upload Test Reports
               if: failure()
