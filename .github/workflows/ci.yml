@@ -1,37 +1,37 @@
 name: CI for the CRM
 
 on:
-    push:
-        branches: ["master"]
-    pull_request:
-        branches: ["master"]
+  push:
+    branches: ["master", "develop"]
+  pull_request:
+    branches: ["master", "develop"]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Set up JDK 21
-              uses: actions/setup-java@v4
-              with:
-                  java-version: "21"
-                  distribution: "temurin"
-                  cache: "maven"
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
 
-            - name: Build and Test with Maven
-              run: mvn -B test
-              env:
-                  DB_URL: jdbc:h2:mem:testdb
-                  DB_USERNAME: sa
-                  DB_PASSWORD: ""
-                  JWT_SECRET: dGVzdC1zZWNyZXQta2V5LWZvci11bml0LXRlc3RzLW9ubHk=
+      - name: Build and Test with Maven
+        run: mvn -B test
+        env:
+          DB_URL: jdbc:h2:mem:testdb
+          DB_USERNAME: sa
+          DB_PASSWORD: ""
+          JWT_SECRET: dGVzdC1zZWNyZXQta2V5LWZvci11bml0LXRlc3RzLW9ubHk=
 
-            - name: Upload Test Reports
-              if: failure()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: test-reports
-                  path: target/surefire-reports/
+      - name: Upload Test Reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: target/surefire-reports/
