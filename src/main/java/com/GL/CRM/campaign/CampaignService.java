@@ -8,16 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor //lombok ano generate const injection automaticly(no autowired needed)
 public class CampaignService{
-    private CampaignRepository campaignRepository;
-    private CampaignMapper campaignMapper;
-    private CustomerRepository customerRepository;
-    private EmailService emailService;
+    private final CampaignRepository campaignRepository;
+    private final CampaignMapper campaignMapper;
+    private final CustomerRepository customerRepository;
+    private final EmailService emailService;
 
     public List<CampaignResponse> getAll(){
         return  campaignRepository.findAll ()
@@ -38,15 +39,16 @@ public class CampaignService{
         return  campaignMapper.toResponse(campaignRepository.save(campaign));
 
     }
-    public CampaignResponse update(Long id, CampaignRequest campaignRequest){
-        Campaign campaign = campaignRepository.findById (id)
-                .orElseThrow (()-> new ResourceNotFoundException("campaign not found"));
+    public CampaignResponse update(Long id, CampaignRequest campaignRequest) {
+        Campaign campaign = campaignRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("campaign not found"));
 
-        if (campaign.getStatus ( ) == CampaignStatus.SENT ){
-            throw new IllegalStateException ( "can not edit a sent campaign" );
+        if (campaign.getStatus() == CampaignStatus.SENT) {
+            throw new IllegalStateException("can not edit a sent campaign");
         }
 
-        return  campaignMapper.toResponse(campaignRepository.save(campaign));
+        campaignMapper.updateEntity(campaignRequest,campaign); //  missing
+        return campaignMapper.toResponse(campaignRepository.save(campaign));
     }
     public CampaignResponse send(Long id){
         Campaign campaign = campaignRepository.findById ( id )
@@ -55,8 +57,23 @@ public class CampaignService{
         if (campaign.getStatus ( ) == CampaignStatus.SENT ){
             throw new IllegalStateException ( "campaign already sent " );
         }
-        // TO DO : setup JavaMailSender !!!  :
+        customerRepository.findAll().forEach(customer -> {
+            if (customer.getEmail() != null) {
+                try {
+                    emailService.sendEmail(
+                            customer.getEmail(),
+                            campaign.getSubject(),
+                            campaign.getBody()
+                    );
+                    Thread.sleep(1100); // wait 1.1 seconds between emails
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
 
+        campaign.setStatus(CampaignStatus.SENT);
+        campaign.setSentAt( LocalDateTime.now());
         return campaignMapper.toResponse(campaignRepository.save(campaign));
     }
 

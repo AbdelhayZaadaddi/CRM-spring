@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign,Long>{
-    List<Campaign> fingByStatus ( CampaignStatus status);
-
+    List<Campaign> findByStatus(CampaignStatus status);
 }

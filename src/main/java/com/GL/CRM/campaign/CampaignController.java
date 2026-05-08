@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/campaign")
+@RequestMapping("/api/campaigns")
 @RequiredArgsConstructor
 public class CampaignController {
     private final  CampaignService campaignService  ;
@@ -33,7 +33,7 @@ public class CampaignController {
                                                     @Valid @RequestBody CampaignRequest request) {
         return ResponseEntity.ok (campaignService.update ( id, request ) );
     }
-    @PutMapping("/{id}/send")
+    @PostMapping("/{id}/send")
     public ResponseEntity<CampaignResponse> send (@PathVariable Long id){
         return ResponseEntity.ok ( campaignService.send ( id ) );
     }
