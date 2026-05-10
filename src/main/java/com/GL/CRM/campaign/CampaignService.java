@@ -79,11 +79,15 @@ public class CampaignService{
 
 
     @Transactional
-    public void deleteById(Long id){
-        if (!campaignRepository.existsById ( id )) {
-            throw new EntityNotFoundException ("campaign not found " );
+    public void deleteById(Long id) {
+        Campaign campaign = campaignRepository.findById(id)  //fix : use finById not getById (test failed)
+                .orElseThrow(() -> new ResourceNotFoundException("campaign not found"))  ;
+
+        if (campaign. getStatus() == CampaignStatus.SENT) {
+            throw new IllegalStateException ("cannot delete a sent campaign :(");
         }
-        campaignRepository.deleteById ( id );
+
+        campaignRepository.deleteById(id);
     }
 
 }
