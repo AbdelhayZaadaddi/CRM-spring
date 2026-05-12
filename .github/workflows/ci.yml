@@ -29,6 +29,13 @@ jobs:
           DB_PASSWORD: ""
           JWT_SECRET: dGVzdC1zZWNyZXQta2V5LWZvci11bml0LXRlc3RzLW9ubHk=
 
+          MAIL_HOST: sandbox.smtp.mailtrap.io
+          MAIL_PORT: 2525
+          MAIL_USERNAME: 37b098a51dd9d3
+          MAIL_PASSWORD: 9fe9b446b29679
+
+
+
       - name: Upload Test Reports
         if: failure()
         uses: actions/upload-artifact@v4
